@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0.318-noble AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.401-noble AS build
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY backend ./backend
