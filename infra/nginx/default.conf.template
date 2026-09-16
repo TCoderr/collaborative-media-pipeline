@@ -1,0 +1,32 @@
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+    client_max_body_size 27m;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy same-origin always;
+    location = /health/live { access_log off; return 200 'healthy'; }
+    location /api/ {
+        add_header Cache-Control "no-store" always;
+        proxy_pass ${API_UPSTREAM};
+        proxy_set_header Host ${API_HOST};
+        proxy_ssl_server_name on;
+        proxy_ssl_name ${API_HOST};
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 120s;
+        proxy_request_buffering off;
+    }
+    location /hubs/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host ${API_HOST};
+        proxy_ssl_server_name on;
+        proxy_ssl_name ${API_HOST};
+        proxy_read_timeout 120s;
+        proxy_buffering off;
+    }
+    location / { try_files $uri $uri/ /index.html; }
+}

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MediaPipeline.Domain\MediaPipeline.Domain.csproj" />
+    <ProjectReference Include="..\..\src\MediaPipeline.Application\MediaPipeline.Application.csproj" />
+    <ProjectReference Include="..\..\src\MediaPipeline.Infrastructure\MediaPipeline.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+</Project>

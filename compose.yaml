@@ -1,0 +1,116 @@
+name: collaborative-media-pipeline
+x-app-environment: &app-environment
+  ConnectionStrings__MediaPipeline: Host=postgres;Database=quire;Username=quire;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+  RabbitMq__HostName: rabbitmq
+  RabbitMq__Port: "5672"
+  RabbitMq__VirtualHost: quire
+  RabbitMq__UserName: quire
+  RabbitMq__Password: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+  Storage__Provider: Local
+  Storage__Local__RootPath: /media
+  Media__MaxPixels: "16000000"
+  RabbitMq__MaxConcurrentMessages: "1"
+services:
+  postgres:
+    image: collaborative-media-pipeline-postgres:local
+    build: { context: ., dockerfile: infra/images/postgres.Dockerfile }
+    environment:
+      POSTGRES_USER: quire
+      POSTGRES_DB: quire
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    ports: ["127.0.0.1:${POSTGRES_PORT:-55432}:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quire -d quire"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 1g
+  rabbitmq:
+    image: collaborative-media-pipeline-rabbitmq:local
+    build: { context: ., dockerfile: infra/images/rabbitmq.Dockerfile }
+    environment:
+      RABBITMQ_DEFAULT_USER: quire
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?Set RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: quire
+    ports: ["127.0.0.1:${RABBITMQ_PORT:-55672}:5672"]
+    volumes: ["rabbit-data:/var/lib/rabbitmq"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    mem_limit: 1g
+  storage-init:
+    image: collaborative-media-pipeline-storage-init:local
+    build: { context: ., dockerfile: infra/images/storage-init.Dockerfile }
+    user: "0:0"
+    command: ["sh", "-c", "chown 1654:1654 /media /keys && chmod 700 /media /keys"]
+    volumes: ["media:/media", "keys:/keys"]
+    network_mode: none
+    restart: "no"
+  migrate:
+    image: collaborative-media-pipeline-api:local
+    build:
+      context: .
+      dockerfile: backend/src/MediaPipeline.Api/Dockerfile
+    environment: *app-environment
+    command: ["--migrate"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+  api:
+    image: collaborative-media-pipeline-api:local
+    build:
+      context: .
+      dockerfile: backend/src/MediaPipeline.Api/Dockerfile
+    environment:
+      <<: *app-environment
+      ASPNETCORE_ENVIRONMENT: Development
+      DataProtection__KeyPath: /keys
+    ports: ["127.0.0.1:5295:8080"]
+    volumes: ["media:/media", "keys:/keys"]
+    read_only: true
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      storage-init: { condition: service_completed_successfully }
+      rabbitmq: { condition: service_healthy }
+  worker:
+    image: collaborative-media-pipeline-worker:local
+    build:
+      context: .
+      dockerfile: backend/src/MediaPipeline.Worker/Dockerfile
+    environment: *app-environment
+    volumes: ["media:/media"]
+    read_only: true
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    restart: on-failure
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      storage-init: { condition: service_completed_successfully }
+      rabbitmq: { condition: service_healthy }
+  frontend:
+    image: collaborative-media-pipeline-frontend:local
+    build: .
+    environment:
+      API_UPSTREAM: http://api:8080
+    ports: ["127.0.0.1:5195:8080"]
+    mem_limit: 128m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on:
+      api: { condition: service_healthy }
+volumes:
+  postgres-data:
+  rabbit-data:
+  media:
+  keys:
