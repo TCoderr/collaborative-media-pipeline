@@ -1,0 +1,100 @@
+name: verify
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  application:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      POSTGRES_PASSWORD: ci_ephemeral_postgres_only
+      RABBITMQ_PASSWORD: ci_ephemeral_rabbit_only
+      MEDIA_PIPELINE_TEST_POSTGRES: Host=127.0.0.1;Port=55432;Database=quire;Username=quire;Password=ci_ephemeral_postgres_only
+      MEDIA_PIPELINE_TEST_RABBITMQ_VHOST: quire
+      MEDIA_PIPELINE_TEST_RABBITMQ_USER: quire
+      MEDIA_PIPELINE_TEST_RABBITMQ_PASSWORD: ci_ephemeral_rabbit_only
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1
+        with:
+          dotnet-version: '9.0.x'
+      - run: npm install --global npm@12.0.2
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm test && npm run build
+      - run: dotnet restore backend/MediaPipeline.sln
+      - name: Fail on vulnerable NuGet packages, including transitives
+        run: |
+          mkdir -p .local
+          dotnet list backend/MediaPipeline.sln package --vulnerable --include-transitive --format json > .local/nuget-audit.json
+          python3 scripts/check-nuget-audit.py .local/nuget-audit.json
+      - name: Build and install pinned supporting tools
+        run: bash scripts/install-supporting-tools.sh && bash scripts/check-buildx.sh
+      - name: Scan publication files for secrets
+        run: python3 scripts/security-secrets.py
+      - name: Build all final runtime images
+        run: |
+          docker compose build --pull
+          docker build -f infra/images/terraform.Dockerfile -t collaborative-media-pipeline-terraform:local .
+          docker build --target build -t collaborative-media-pipeline-node-build:local .
+          docker build --target build -f backend/src/MediaPipeline.Api/Dockerfile -t collaborative-media-pipeline-dotnet-build:local .
+      - name: Start isolated PostgreSQL and RabbitMQ
+        run: docker compose up -d --wait --wait-timeout 180 postgres rabbitmq
+      - run: dotnet test backend/MediaPipeline.sln --no-restore -c Release
+      - name: Container readiness and real browser lifecycle
+        run: |
+          docker compose up -d --wait --wait-timeout 180
+          node scripts/check-container-health.mjs
+          npx playwright install --with-deps chromium
+          QUIRE_WEB_URL=http://127.0.0.1:5195 npm run test:e2e
+      - name: Include Docker plugins in the supporting-tool audit
+        run: |
+          docker info --format '{{json .ClientInfo.Plugins}}' > .local/docker-plugins.json
+          python3 - <<'PY'
+          import json, shutil
+          from pathlib import Path
+          for plugin in json.loads(Path('.local/docker-plugins.json').read_text()):
+              if plugin.get('Name') in ('buildx', 'compose'):
+                  shutil.copy2(plugin['Path'], '.local/security-tools/docker-' + plugin['Name'])
+          PY
+      - name: Unsuppressed HIGH and CRITICAL runtime and tooling gate
+        run: bash scripts/security-images.sh
+      - name: Container diagnostics on failure
+        if: failure()
+        run: docker compose ps && docker compose logs --tail 80
+      - name: Remove ephemeral CI stack
+        if: always()
+        run: docker compose down -v --remove-orphans
+  terraform:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [dev, staging, prod]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
+        with:
+          terraform_version: '1.16.3'
+      - run: terraform fmt -check -recursive infra/terraform
+      - run: terraform -chdir=infra/terraform/environments/${{ matrix.environment }} init -backend=false -input=false -lockfile=readonly
+      - run: terraform -chdir=infra/terraform/environments/${{ matrix.environment }} validate
+      - name: Audit Terraform provider binaries
+        run: |
+          bash scripts/install-supporting-tools.sh
+          .local/security-tools/trivy rootfs --format json --output .local/terraform-tool-audit.json --scanners vuln --severity HIGH,CRITICAL --ignorefile /dev/null --ignore-unfixed=false --exit-code 1 .local/security-tools
+          python3 scripts/check-tool-audit.py .local/terraform-tool-audit.json
+          .local/security-tools/trivy rootfs --format json --output .local/provider-audit.json --scanners vuln --severity HIGH,CRITICAL --ignorefile /dev/null --ignore-unfixed=false --exit-code 1 infra/terraform/environments/${{ matrix.environment }}/.terraform/providers
+          python3 scripts/check-tool-audit.py .local/provider-audit.json

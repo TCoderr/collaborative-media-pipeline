@@ -1,0 +1,40 @@
+<Project>
+
+  <!--
+    Quire — shared build settings for every project in the solution.
+    Kept in one place so quality gates cannot drift between projects.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <!--
+      CA1848 asks every log call site to be a compiled LoggerMessage delegate. The
+      structured-logging extension methods used here are already allocation-light at
+      Information level and are far more readable at a call site, which matters more for
+      code whose whole point is operational legibility. Enabled analyzers stay strict
+      everywhere else, and warnings remain errors.
+    -->
+    <!-- CS1591: not every public member needs an XML comment; the doc file exists
+         only so IDE0005 (unused usings) can run as a build error. -->
+    <NoWarn>$(NoWarn);CA1848;CS1591</NoWarn>
+
+    <!-- Reproducible-ish builds: version stamped from CI, defaulted locally. -->
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,26 @@
+--- a/store/util.go
++++ b/store/util.go
+@@ -5,7 +5,7 @@
+ 	"regexp"
+ 	"strings"
+ 
+-	"github.com/docker/docker/pkg/namesgenerator"
++	"github.com/google/uuid"
+ 	"github.com/pkg/errors"
+ )
+ 
+@@ -39,8 +39,12 @@
+ 
+ func GenerateName(txn *Txn) (string, error) {
+ 	var name string
+-	for i := range 6 {
+-		name = namesgenerator.GetRandomName(i)
++	for range 6 {
++		id, err := uuid.NewRandom()
++		if err != nil {
++			return "", errors.Wrap(err, "generate builder name")
++		}
++		name = "builder_" + id.String()
+ 		if _, err := txn.NodeGroupByName(name); err != nil {
+ 			if !os.IsNotExist(errors.Cause(err)) {
+ 				return "", err

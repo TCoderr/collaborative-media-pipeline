@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Quire — Collaborative media pipeline</title>
+    <meta
+      name="description"
+      content="Quire is a collaborative media pipeline: projects, assets, immutable versions, processing, review, approvals and delivery history, kept together in one dark editorial archive."
+    />
+
+    <!-- Editorial serif (Fraunces) + clean sans (Manrope) + mono meta (Space Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Manrope:wght@300..700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="nav__brand" href="#hero" aria-label="Quire — home">
+        <span class="nav__mark">Quire</span>
+        <span class="nav__mark-sub">Pipeline</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#workflow">Workflow</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#archive">Archive</a>
+        <a href="#lifecycle">Lifecycle</a>
+        <a href="#delivery">Delivery</a>
+      </nav>
+      <span class="nav__status">
+        <span class="nav__dot" aria-hidden="true"></span>
+        Workspace · Version archive
+      </span>
+    </header>
+
+    <main>
+      <!-- ── HERO ─────────────────────────────────────────────────────── -->
+      <section class="hero" id="hero">
+        <div class="hero__topbar">
+          <span class="hero__meta">Archive · Vol. 01</span>
+          <span class="hero__meta hero__meta--center">Upload · Process · Review · Deliver</span>
+          <span class="hero__meta">Versions 001 → 012</span>
+        </div>
+
+        <div class="hero__core">
+          <p class="hero__eyebrow">Versions · Review · Delivery</p>
+          <h1 class="hero__title">
+            <span class="hero__line">The archive keeps</span>
+            <span class="hero__line hero__line--italic">every version —</span>
+            <span class="hero__line">and every decision.</span>
+          </h1>
+        </div>
+
+        <div class="hero__bottom">
+          <p class="hero__caption">
+            A rotating index of recent versions. Every frame passes through processing,
+            review and approval before it ships.
+          </p>
+          <span class="hero__scroll" aria-hidden="true">
+            <span class="hero__scroll-label">Scroll to enter</span>
+            <span class="hero__scroll-line"></span>
+          </span>
+          <p class="hero__signoff">Quire · Media Pipeline · MMXXVI</p>
+        </div>
+      </section>
+
+      <!-- ── PAGE STACK (slides up over the sticky hero) ───────────────── -->
+      <div class="page-stack">
+        <!-- I · WORKFLOW -------------------------------------------------- -->
+        <section class="section section--workflow" id="workflow">
+          <div class="section__head">
+            <p class="section__label reveal-text">Workflow · Chapter I</p>
+            <h2 class="section__title reveal-text">
+              We treat every upload<br />
+              as a <em>version to be kept</em>,<br />
+              not a file to be replaced.
+            </h2>
+          </div>
+          <div class="section__body workflow__body">
+            <p class="reveal-text">
+              Quire is a collaborative media pipeline. A project holds its assets; every
+              asset holds its versions; every version carries its own processing state,
+              its review, and the record of who approved it and when. Nothing is
+              overwritten in place.
+            </p>
+            <p class="reveal-text">
+              Uploads are processed into derivatives people can actually look at:
+              thumbnails, proxies, previews sized for the room they will be seen in.
+              Reviewers annotate the frame, not a filename. Approvals are explicit,
+              dated, and undone only by another decision.
+            </p>
+            <p class="reveal-text">
+              There is no house style here, only a house temperament: keep everything,
+              show the state plainly, and make the history readable by the people who
+              were not in the room.
+            </p>
+          </div>
+        </section>
+
+        <!-- II · CAPABILITIES --------------------------------------------- -->
+        <section class="section section--capabilities" id="capabilities">
+          <div class="section__head">
+            <p class="section__label reveal-text">Capabilities · Chapter II</p>
+            <h2 class="section__title reveal-text">What the pipeline does with a frame.</h2>
+          </div>
+
+          <ul class="list list--practice">
+            <li class="list__row reveal-text">
+              <span class="list__index">01</span>
+              <span class="list__title">Projects &amp; Membership</span>
+              <span class="list__desc">
+                A project is the boundary: who can see the work, who can review it, who can approve it.
+              </span>
+              <span class="list__arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="list__row reveal-text">
+              <span class="list__index">02</span>
+              <span class="list__title">Assets &amp; Versions</span>
+              <span class="list__desc">
+                Each upload becomes a new, immutable version. Earlier ones stay reachable; nothing is overwritten.
+              </span>
+              <span class="list__arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="list__row reveal-text">
+              <span class="list__index">03</span>
+              <span class="list__title">Processing</span>
+              <span class="list__desc">
+                Derivatives are made from the source — thumbnails, proxies, web previews — with the state visible while it happens.
+              </span>
+              <span class="list__arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="list__row reveal-text">
+              <span class="list__index">04</span>
+              <span class="list__title">Review &amp; Notes</span>
+              <span class="list__desc">
+                Notes sit on the version they were written against. A note on v3 does not follow you to v4.
+              </span>
+              <span class="list__arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="list__row reveal-text">
+              <span class="list__index">05</span>
+              <span class="list__title">Approval &amp; Delivery</span>
+              <span class="list__desc">
+                An approved version ships with its history intact: who decided, when, and on which frame.
+              </span>
+              <span class="list__arrow" aria-hidden="true">→</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- III · ARCHIVE ------------------------------------------------- -->
+        <section class="section section--archive" id="archive">
+          <div class="section__head">
+            <p class="section__label reveal-text">Archive · Chapter III</p>
+            <h2 class="section__title reveal-text">Recent versions, in order.</h2>
+          </div>
+
+          <!-- Rows are rendered from src/data/archive.js so the list and the
+               spiral describe the same versions. See src/archive/list.js. -->
+          <ul class="list list--field" id="archive-list" aria-label="Version archive"></ul>
+        </section>
+
+        <!-- IV · LIFECYCLE ------------------------------------------------ -->
+        <section class="section section--lifecycle" id="lifecycle">
+          <div class="section__head">
+            <p class="section__label reveal-text">Lifecycle · Chapter IV</p>
+            <h2 class="section__title reveal-text">Four states, no shortcuts.</h2>
+          </div>
+
+          <div class="steps">
+            <article class="step reveal-text">
+              <p class="step__no">State 01</p>
+              <h3 class="step__title">Upload</h3>
+              <p class="step__body">
+                A file arrives and becomes a version — numbered, hashed, attached to its
+                asset. The source is kept exactly as it came, alongside everything made
+                from it.
+              </p>
+            </article>
+            <article class="step reveal-text">
+              <p class="step__no">State 02</p>
+              <h3 class="step__title">Process</h3>
+              <p class="step__body">
+                The pipeline makes derivatives from the source: thumbnails, proxies,
+                previews. The state is visible while it runs, and a failure is a state
+                with a reason, not a mystery.
+              </p>
+            </article>
+            <article class="step reveal-text">
+              <p class="step__no">State 03</p>
+              <h3 class="step__title">Review</h3>
+              <p class="step__body">
+                Reviewers see the version, not the folder. Notes are pinned to the frame
+                they were written on, and nothing moves forward until someone says so.
+              </p>
+            </article>
+            <article class="step reveal-text">
+              <p class="step__no">State 04</p>
+              <h3 class="step__title">Approve &amp; deliver</h3>
+              <p class="step__body">
+                One decision, dated and attributed. The approved version ships with its
+                history — every earlier version, every note, every state it passed
+                through.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <!-- V · DELIVERY -------------------------------------------------- -->
+        <section class="section section--delivery" id="delivery">
+          <div class="section__head">
+            <p class="section__label reveal-text">Delivery · Chapter V</p>
+            <h2 class="section__title reveal-text">
+              Have work that deserves<br />
+              <em>a second look</em> before<br />
+              it ships?
+            </h2>
+          </div>
+
+          <a class="contact__email reveal-text" href="mailto:hello@quire.co">
+            hello@quire.co
+            <span class="contact__arrow" aria-hidden="true">↗</span>
+          </a>
+
+          <div class="contact__cols">
+            <div class="contact__col reveal-text">
+              <p class="contact__label">Start a project</p>
+              <p class="contact__value">Bring the source files.</p>
+              <p class="contact__value">Invite your reviewers.</p>
+            </div>
+            <div class="contact__col reveal-text">
+              <p class="contact__label">Collaboration</p>
+              <p class="contact__value">Owners, reviewers, approvers.</p>
+              <p class="contact__value">One project, one record.</p>
+            </div>
+            <div class="contact__col reveal-text">
+              <p class="contact__label">Delivery</p>
+              <p class="contact__value">Approved versions only.</p>
+              <p class="contact__value">History travels with them.</p>
+            </div>
+            <div class="contact__col reveal-text">
+              <p class="contact__label">Status</p>
+              <p class="contact__value">Preview build.</p>
+              <p class="contact__value">Project archive, live state.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- FOOTER -------------------------------------------------------- -->
+        <footer class="footer">
+          <div class="footer__top">
+            <span class="footer__mark">Quire</span>
+            <a class="footer__totop" href="#hero">Back to top ↑</a>
+          </div>
+          <div class="footer__meta">
+            <p>© MMXXVI Quire. Every version kept.</p>
+            <p>Set in Fraunces &amp; Manrope. Nothing ships without a second look.</p>
+          </div>
+        </footer>
+      </div>
+    </main>
+
+    <script type="module" src="/src/script.js"></script>
+  </body>
+</html>

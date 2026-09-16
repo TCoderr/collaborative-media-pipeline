@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: nuget
+    directory: /backend
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directories: [/, /backend/src/MediaPipeline.Api, /backend/src/MediaPipeline.Worker, /infra/images]
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: terraform
+    directories: [/infra/terraform/environments/dev, /infra/terraform/environments/staging, /infra/terraform/environments/prod]
+    schedule: { interval: weekly }
