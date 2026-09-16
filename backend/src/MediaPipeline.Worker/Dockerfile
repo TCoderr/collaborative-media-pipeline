@@ -5,7 +5,7 @@ COPY backend ./backend
 RUN dotnet restore backend/src/MediaPipeline.Worker/MediaPipeline.Worker.csproj
 RUN dotnet publish backend/src/MediaPipeline.Worker/MediaPipeline.Worker.csproj -c Release --no-restore -o /out /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0.20-noble-chiseled-extra
+FROM mcr.microsoft.com/dotnet/aspnet:10.0.12-noble-chiseled-extra
 WORKDIR /app
 COPY --from=build /out ./
 USER 1654
