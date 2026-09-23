@@ -1,4 +1,4 @@
-FROM golang:1.26.8-alpine3.23@sha256:33ce311e5eecedee48ec1b84419c1306e9fbd71009f0d5c3f2a6904b579c1ecc AS toolchain
+FROM golang:1.27.0-alpine3.23@sha256:3747dcba41c8b0db3211fda4db61638b980e17ac5bb3c94460a975a9cfe19395 AS toolchain
 RUN apk upgrade --no-cache && apk add --no-cache git
 ENV CGO_ENABLED=0 GOFLAGS=-mod=mod GOTOOLCHAIN=local GOMEMLIMIT=2GiB
 
