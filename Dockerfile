@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build
+FROM node:25-alpine AS build
 RUN apk upgrade --no-cache && npm install --global npm@12.0.2
 # Patch the build tool's own vulnerable dependencies until npm bundles these fixes.
 RUN node -e "const fs=require('fs'),f='/usr/local/lib/node_modules/npm/package.json',p=JSON.parse(fs.readFileSync(f));delete p.devDependencies;delete p.workspaces;p.overrides={...p.overrides};for(const [n,v] of Object.entries({'tar':'7.5.21','ip-address':'10.3.1','brace-expansion':'5.0.9'})){p.overrides[n]=v;if(p.dependencies[n])p.dependencies[n]=v;}fs.writeFileSync(f,JSON.stringify(p));" \
