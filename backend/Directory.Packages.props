@@ -11,7 +11,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.20" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.20" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageVersion Include="Npgsql" Version="9.0.5" />
+    <PackageVersion Include="Npgsql" Version="10.0.3" />
     <PackageVersion Include="Npgsql.OpenTelemetry" Version="9.0.5" />
   </ItemGroup>
 
